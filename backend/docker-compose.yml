@@ -1,0 +1,26 @@
+services:
+  # Node-Ecommerce
+  api:
+    build: .          # Tells Compose to look for the 'Dockerfile' in this folder
+    container_name: Node-Ecommerce
+    ports:
+      - "4000:4000"   # Maps your computer's port 4000 to the container's port 4000
+    environment:
+      - .env #MONGO_URL=mongodb://localhost:27017/ 
+    depends_on:
+      - mongo
+    restart: always
+
+  # MondoDB
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - '27017:27017'
+volumes:
+  mongodata:
+    driver: local
+
+  
+
+  

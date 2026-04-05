@@ -1,0 +1,583 @@
+Agile
+¨¨¨¨¨
+
+
+Initiated - 06/02/2026
+
+Put it in production on - 28/02/2026
+
+
+
+
+
+
+
+
+Package.json
+¨¨¨¨¨¨¨¨¨¨¨¨
+
+	O body-parse serve para conversoes, in this case when the
+user clicks on a certain link, the body-parse directs to the right
+addr.
+
+
+
+
+
+
+
+
+
+
+
+
+Using docker
+¨¨¨¨¨¨¨¨¨¨¨¨
+
+
+	docker-compose up -d --build
+
+
+
+The param --build it's used only once to build the image
+
+
+
+
+
+
+
+
+
+
+Install extension for Mongo
+¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
+
+Search for the following ext:
+
+	
+	MongoDB for VS Code
+
+
+
+
+
+
+After installation, go to Advanced Connection Settings
+
+
+Click on:
+
+	Save e Connect
+
+
+
+
+
+You can read documentation on -> mongodb.com/docs/manual
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+JWT Tokens
+¨¨¨¨¨¨¨¨¨¨
+
+
+1. Install the Essentials.You’ll need jsonwebtoken to handle the tokens and dotenv
+ to keep your "Secret Key" safe (never hardcode your secrets!).
+
+	npm install jsonwebtoken dotenv
+
+
+
+2. Configure Your Secret Key.Create a .env file in your root directory. This key is
+used to sign and verify your tokens. If someone gets this, they can forge tokens,
+so keep it private.
+
+	JWT_SECRET=your_super_secret_random_string_here
+	PORT=3000
+
+
+3. The Implementation Workflow
+The process generally follows this flow: Login-> Generate Token -> Send to Client -> 
+Client sends token back in Headers -> Verify Token.
+
+	A. Generating the Token (The Login Logic)When a user logs in successfully, you
+	 "sign" a token containing their non-sensitive info (like userId).
+	
+	
+	const jwt = require('jsonwebtoken');
+
+	const generateToken = (userId) => {
+  		return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    		  expiresIn: '1h', // Token expires in 1 hour
+  		});
+	};
+
+
+B. Creating Authentication MiddlewareThis is a reusable function that protects your 
+"private" routes. It checks the Authorization header for a valid token.
+
+const protect = (req, res, next) => {
+ let token;
+
+  // Check if token exists in headers (Bearer <token>)
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+
+      // Verify token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      // Attach user info to the request object
+      req.user = decoded;
+      next();
+    } catch (error) {
+      res.status(401).json({ message: 'Not authorized, token failed' });
+    }
+  }
+
+  if (!token) {
+    res.status(401).json({ message: 'Not authorized, no token' });
+  }
+};
+
+
+
+
+C. Applying to Your RoutesNow you can use that middleware to guard specific endpoints.
+
+
+const express = require('express');
+const router = express.Router();
+
+// Public route
+router.post('/login', (req, res) => {
+  // ... validate user ...
+  const token = generateToken(user.id);
+  res.json({ token });
+});
+
+// Protected route
+router.get('/profile', protect, (req, res) => {
+  res.send(`Welcome user ${req.user.id}, this is private data.`);
+});
+
+
+
+
+Key Best Practices
+
+	Never put passwords in the payload: Anyone can decode a JWT 
+	(using sites like jwt.io). The signature ensures it hasn't been tampered with, 
+	but it doesn't hide the data inside.
+
+	Use HTTPS: Since tokens are sent in headers,
+ 	they can be intercepted on non-secure connections.
+
+	Expiration is your friend: Keep expiresIn short (e.g., 15 minutes to 1 hour) 
+	to minimize the damage if a token is stolen.
+
+
+
+Would you like me to show you how to implement Refresh Tokens so users don't have to log in every hour?
+
+
+
+
+
+
+
+
+
+The Best Way to Generate a Secret
+¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
+You don't need another application. You can generate a professional-grade secret right from your 
+terminal using Node.js's built-in crypto module.
+
+Run this command in your terminal:
+
+
+	node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+
+
+
+
+  Why this is better:
+    Length: It generates a 128-character string.
+
+    Randomness: It uses hardware-level entropy, making it mathematically impossible to guess.
+
+    Uniqueness: Every time you run it, you get a completely different result.
+
+
+
+How to Manage the Secret
+Once you generate that long string, here is how you should handle it:
+
+Paste it into your .env file:
+
+
+	JWT_SECRET=49db...[your-long-generated-string]...a21b
+
+
+
+
+Add .env to your .gitignore: Never commit this secret to GitHub or GitLab. If you do,
+ the secret is compromised immediately.
+
+Use Environment Variables in Production: When you deploy (to Heroku, AWS, or Vercel), you add
+ the secret via their dashboard settings, not through a file.
+
+Where to store it?
+If you are looking for "Enterprise Grade" security, some teams use Secret Management Services
+ rather than simple .env files:
+
+	.AWS Secrets Manager
+
+	.HashiCorp Vault
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Using Grafana
+¨¨¨¨¨¨¨¨¨¨¨¨¨¨
+
+ Before getting started, configure a docker-compose.yml
+file on your back-end Node, side by side of your package.json
+and run it with:
+
+
+	docker-compose up
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Login
+¨¨¨¨¨¨
+
+
+
+m@m.com
+user
+123
+
+
+Tables
+_________
+
+	Compras			Product_name      Frete          
+	¨¨¨¨¨¨¨¨		¨¨¨¨¨¨¨¨¨¨¨¨	  ¨¨¨¨¨¨	 
+	Id_Compra		Id_Product        Id_Frete       
+	Datetime		Name		  Vlr		 
+	FormaPagto		Quant		  Cep		 
+	Id_Product		Vlr		  		 
+	Status							 
+								
+								 	
+	VlrTotal						 
+	Id_Frete						 
+	Dt_Registro
+	St_Registro
+
+
+
+
+
+Users
+¨¨¨¨¨¨¨¨		
+     Id_Usuario (INT, PRIMARY KEY)
+     Name (VARCHAR)
+     Id_Buying
+     Email (VARCHAR, UNIQUE)
+     Phone (VARCHAR)
+     Address (TEXT)
+     Role (ENUM: 'customer', 'admin')
+     Created_at (DATETIME)	
+     St_Registry
+     Role (ENUM: 'customer', 'admin')
+
+
+
+
+
+
+Below is a set of core tables for a basic e-commerce system. I've included essential
+fields for each table (with brief data types for clarity), followed by relationships
+with cardinality (e.g., 1:1 for one-to-one, 1:N for one-to-many, N:M for many-to-many).
+This covers users, products, orders, payments, shipping, and reviews.
+Assumptions: Primary keys are auto-incrementing integers; foreign keys
+link tables; many-to-many relationships use junction tables.
+
+
+1. Users
+Stores customer and admin accounts.
+
+Fields:
+	user_id (INT, PRIMARY KEY)
+	email (VARCHAR, UNIQUE)
+	password_hash (VARCHAR)
+	first_name (VARCHAR)
+	last_name (VARCHAR)
+	phone (VARCHAR)
+	address (TEXT)
+	role (ENUM: 'customer', 'admin')
+	created_at (DATETIME)
+
+
+2. Categories
+Organizes products into hierarchical groups.
+
+Fields:
+	category_id (INT, PRIMARY KEY)
+	name (VARCHAR)
+	description (TEXT)
+	parent_category_id (INT, FOREIGN KEY to category_id, NULL for root)
+
+3. Products
+Holds product details and inventory.
+
+Fields:
+	product_id (INT, PRIMARY KEY)
+	name (VARCHAR)
+	description (TEXT)
+	price (DECIMAL)
+	stock_quantity (INT)
+	category_id (INT, FOREIGN KEY to Categories)
+	image_url (VARCHAR)
+	created_at (DATETIME)
+
+
+
+
+4. Orders
+Records customer purchases.
+
+Fields:
+	order_id (INT, PRIMARY KEY)
+	user_id (INT, FOREIGN KEY to Users)
+	order_date (DATETIME)
+	total_amount (DECIMAL)
+	status (ENUM: 'pending', 'shipped', 'delivered', 'cancelled')
+	shipping_address (TEXT)
+
+
+
+
+
+5. Order_Items
+Junction table for products in orders (handles quantities).
+
+Fields:
+	order_item_id (INT, PRIMARY KEY)
+	order_id (INT, FOREIGN KEY to Orders)
+	product_id (INT, FOREIGN KEY to Products)
+	quantity (INT)
+	unit_price (DECIMAL)
+
+
+
+
+6. Payments
+Tracks payment transactions.
+
+Fields:
+	payment_id (INT, PRIMARY KEY)
+	order_id (INT, FOREIGN KEY to Orders)
+	payment_method (ENUM: 'credit_card', 'paypal', 'bank_transfer')
+	amount (DECIMAL)
+	status (ENUM: 'pending', 'completed', 'failed')
+	transaction_id (VARCHAR)
+	payment_date (DATETIME)
+
+7. Shipping
+Manages delivery details.
+
+Fields:
+	shipping_id (INT, PRIMARY KEY)
+	order_id (INT, FOREIGN KEY to Orders)
+	carrier (VARCHAR, e.g., 'UPS', 'FedEx')
+	tracking_number (VARCHAR)
+	shipped_date (DATETIME)
+	delivered_date (DATETIME)
+
+8. Reviews
+Allows customers to rate and comment on products.
+
+Fields:
+	review_id (INT, PRIMARY KEY)
+	product_id (INT, FOREIGN KEY to Products)
+	user_id (INT, FOREIGN KEY to Users)
+	rating (INT, 1-5)
+	comment (TEXT)
+	created_at (DATETIME)
+
+
+9. Shopping_Cart
+Temporary storage for items before checkout (per user).
+
+Fields:
+	cart_id (INT, PRIMARY KEY)
+	user_id (INT, FOREIGN KEY to Users)
+	product_id (INT, FOREIGN KEY to Products)
+	quantity (INT)
+	added_at (DATETIME)
+
+Relationships and Cardinality
+Users to Orders: 1:N (One user can place many orders; user_id in Orders references Users.user_id).
+Users to Reviews: 1:N (One user can write many reviews; user_id in Reviews references Users.user_id).
+Users to Shopping_Cart: 1:N (One user can have many cart items; user_id in Shopping_Cart references Users.user_id).
+
+Categories to Products: 1:N (One category can contain many products; category_id in Products 
+references Categories.category_id). If products can belong to multiple categories, 
+make it N:M with a junction table (e.g., Product_Categories).
+
+Products to Order_Items: 1:N (One product can appear in many order items; product_id in Order_Items references Products.product_id).
+Products to Reviews: 1:N (One product can have many reviews; product_id in Reviews references Products.product_id).
+Products to Shopping_Cart: 1:N (One product can be in many carts; product_id in Shopping_Cart references Products.product_id).
+Orders to Order_Items: 1:N (One order can have many items; order_id in Order_Items references Orders.order_id).
+Orders to Payments: 1:1 (One order has one payment; order_id in Payments references Orders.order_id).
+Orders to Shipping: 1:1 (One order has one shipping record; order_id in Shipping references Orders.order_id).
+
+Categories (self-referential): 1:N (One category can have many subcategories; parent_category_id in
+ Categories references Categories.category_id).
+This setup supports basic e-commerce operations like browsing, ordering, and tracking. For scalability,
+ consider adding indexes on foreign keys and handling many-to-many for product categories if needed.
+ If you specify additional features (e.g., discounts, wishlists), I can expand it.
+
+
+
+
+
+
+
+
+
+
+
+Router component using AuthProvider:
+¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
+
+
+	import PaginaPadrao from 'components/PaginaPadrao';
+import Carrinho from 'pages/Carrinho';
+import Categoria from 'pages/Categoria';
+import Home from 'pages/Home';
+import Login from 'pages/Login';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import ProtectedRoutes from 'components/ProtectedRoutes';
+import { AuthProvider } from 'AuthContext';
+//<Route index element={<Home />} />
+
+export default function Router() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<Login />}>
+            <Route element={<ProtectedRoutes />}/>
+              <Route path='/home' element={<PaginaPadrao />}>
+                <Route index element={<Home />} />
+                <Route path='categoria/:nomeCategoria' element={<Categoria />} />
+                <Route path='carrinho' element={<Carrinho />} />
+              </Route>
+          </Route>
+        </Routes>
+     </BrowserRouter>
+    </AuthProvider>
+    
+  )
+}
+
+
+
+
+
+
+
+
+Previous one:
+
+
+
+     <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<Login />}></Route>
+            {/* <Route element={<ProtectedRoutes />}>*/}
+              <Route path='/Home' element={<PaginaPadrao />}>
+                <Route index element={<Home />} />
+                <Route path='categoria/:nomeCategoria' element={<Categoria />} />
+                <Route path='carrinho' element={<Carrinho />} />
+              </Route>
+        </Routes>
+     </BrowserRouter> 
+	
+
+
+
+
+
+
+
+
+
+Login button:
+¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
+
+		<Btn
+              	   className={styles.finalizar}
+              	   //onClick={() => dispatch(resetarCarrinho())}
+              	   onClick={ handleLoggin }
+                >
+                Login
+                </Btn>
+	
+
+
+
+
+
+
+
+
+
+
+
+	

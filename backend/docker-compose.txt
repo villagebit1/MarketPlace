@@ -1,0 +1,18 @@
+services:
+  api:
+    build: .
+    deploy:
+      replicas: 3 # Tells Docker to run 3 instances of your API
+    environment:
+      - DB_URL=postgres://db:5432/mydb
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:15
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine

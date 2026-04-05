@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Products</title>
+    <!-- Add your CSS links here, e.g., Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Add any other styles or scripts -->
+</head>
+<body>
+    <div class="container">
+        <div style="font-weight: bold; font-size: 25px; color: black; font-family: MozAnimationDelay;">
+            PRODUTOS MAIS RECENTES
+        </div>
+
+        <% if (loading) { %>
+            <!-- Loader component -->
+            <div class="loader">
+                <!-- Add your loader HTML, e.g., a spinner -->
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        <% } else if (error) { %>
+            <!-- Message component -->
+            <div class="alert alert-danger" role="alert">
+                <%= error %>
+            </div>
+        <% } else { %>
+            <div class="row">
+                <% products.forEach(product => { %>
+                    <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
+                        <!-- Product component -->
+                        <div class="card">
+                            <img src="<%= product.image %>" class="card-img-top" alt="<%= product.name %>">
+                            <div class="card-body">
+                                <h5 class="card-title"><%= product.name %></h5>
+                                <p class="card-text"><%= product.description %></p>
+                                <p class="card-text">$<%= product.price %></p>
+                                <a href="/product/<%= product._id %>" class="btn btn-primary">View Product</a>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+
+        <!-- Paginate component -->
+        <% if (pages > 1) { %>
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <% for (let i = 1; i <= pages; i++) { %>
+                        <li class="page-item <%= i === page ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %><%= keyword ? '&keyword=' + encodeURIComponent(keyword) : '' %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                </ul>
+            </nav>
+        <% } %>
+    </div>
+
+    <!-- Add your JS scripts here, e.g., Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

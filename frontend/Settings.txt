@@ -1,0 +1,13 @@
+To avoid problems with the @import 'styles/breakpoints'; line on
+Navbar.module.scss, use this on jsconfig.json:
+
+
+{
+  "compilerOptions": {
+    "baseUrl": "src"
+  },
+  "include": ["src"]
+}
+
+
+It informs that any import is considered initiating from src
