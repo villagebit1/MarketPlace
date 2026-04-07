@@ -17,7 +17,7 @@ router.use(cors({
 }));
 
 router.use(session({
-    secret: 'alura',
+    secret: 'loja virtual',
     resave: false,
     saveUninitialized: false,
     store: sessionStorage

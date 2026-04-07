@@ -4,7 +4,7 @@ const User = require('../models/user')
 class AuthService {
     async login(email, password) {
         const user = await User.findOne(email, password);
-        console.log(`We got into service: ${user}`)//template string
+        console.log(`Chamando o serviço de auth: ${user}`)//template string
 
         if (!user) {
             throw new Error('INVALID_CREDENTIALS');

@@ -33,12 +33,12 @@ class PurchasesService{
             })
             
             var order = new Order(user_id, order_date, total, status, shipping_addr)
-            console.log(`Total calculated on Service: ${total}`)   //
+            console.log(`Total do pedido calculado: ${total}`)   //
             const orderId = await order.save();
             return orderId;
         }
         catch{
-            console.log('Deu ruim')
+            console.log('Erro ao inserir os itens do pedido.')
         }
     }
 }

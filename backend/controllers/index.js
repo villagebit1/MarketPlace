@@ -38,9 +38,9 @@ exports.signup = async(req, res, next) => {
     try {
         user.save()
             .then(
-                console.log('User created succesfully g')
+                console.log('Usuario criado g.')
             )
-            .catch(err => console.log(`Someth went wrong ${err}`))
+            .catch(err => console.log(`Algo deu errado ${err}`))
         res.redirect('/')
         // res.status(201).json({ 
         //     message: "User created successfully",
@@ -102,7 +102,7 @@ exports.order = async(req, res, next) => {
             await orderItem.save();
         }
 
-        res.status(201).json({ message: "Purchase saved!" });
+        res.status(201).json({ message: "Compra salva!" });
 
         console.log(order);
         console.log("Full Body:", JSON.stringify(req.body, null, 2));
@@ -142,7 +142,7 @@ exports.addProducts = async(req, res, next) => {
             // Wait for each save to complete before moving to the next
             await product.save();
         }
-        res.status(201).json({ message: "Tham' !" });
+        res.status(201).json({ message: "Items salvos!" });
 
         console.log(product);
         console.log(`Full Body: ${JSON.stringify(req.body, null, 2)}`);
@@ -150,7 +150,7 @@ exports.addProducts = async(req, res, next) => {
         //const { categoria, descricao, favorito, foto, id, preco, quantidade, titulo } = product;
         //const product = new Product(product_id, name, description, price, stock_quantity)
         
-        //res.json({ message: "Tham' " })
+        //res.json({ message: "Items da compra salvos!' " })
         //res.redirect('/')
     } catch (err) {
         console.log(err);

@@ -243,7 +243,7 @@ export default function Login() {
         const userData = await res.json();
         setUser(userData); // Update auth context
 
-        console.log("Login successful! Moving to store...");
+        console.log("Login realizado com sucesso! Redirecionando para a loja...");
         navigate('/home');                   
     } catch (error) {
         console.error("Submission failed:", error);

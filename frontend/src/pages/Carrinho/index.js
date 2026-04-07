@@ -15,6 +15,30 @@ export default function Carrinho() {
     let total = 0;
     const regexp = new RegExp(state.busca, 'i');
 
+    try {
+          const res = await fetch('http://localhost:4000/products', {
+            method: 'GET', 
+            mode: 'cors',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+            credentials: 'include'
+        });
+    
+        if (!res.ok) {
+          throw new Error(`Erro no servidor: ${res.status}`);
+        }
+
+        const userData = await res.json();
+        setUser(userData); // Update auth context
+
+        navigate('/home');                   
+    } catch (error) {
+        console.error("Submission failed:", error);
+        setError(error.message);
+    };
+
     const carrinhoReduce = state.carrinho.reduce((itens, itemNoCarrinho) => {
       const item = state.itens.find(item => item.id === itemNoCarrinho.id);
       total += (item.preco * itemNoCarrinho.quantidade);
@@ -58,7 +82,7 @@ export default function Carrinho() {
       const productSubmited = res.json();
 
       console.log(itensPurchased);
-      console.log("Purchase finished!");
+      console.log("Compra realizada com sucesso!");
       dispatch(resetarCarrinho());
     } catch (error) {
       console.error("Submission failed:", error);
@@ -92,3 +116,22 @@ export default function Carrinho() {
     </div>
   )
 }
+
+
+
+/*
+  const carrinhoReduce = state.carrinho.reduce((itens, itemNoCarrinho) => {
+      const item = state.itens.find(item => item.id === itemNoCarrinho.id);
+      total += (item.preco * itemNoCarrinho.quantidade);
+      
+      if (item.titulo.match(regexp)) {
+        itens.push({
+          ...item,
+          quantidade: itemNoCarrinho.quantidade,
+        });
+      }
+      itensPurchased = itens;
+      return itens;
+    }, []);
+
+*/
