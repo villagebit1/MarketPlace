@@ -296,11 +296,12 @@ export default function Login() {
                 </ContaAlternativa>
               </SocialMediaDetails>
 
-              <Passport>
-                  titulo="Github world repo"
-                  descricao="Login com GitHub"
-                  img={github}
-              </Passport>
+              <SocialMediaDetails>
+                <ContaAlternativa href="#">
+                  <IconeConta src={github} alt="Login com Github" className="social-media-icon" />
+                  <p>Github</p>
+                </ContaAlternativa>
+              </SocialMediaDetails>
 
             </SocialMedia>
 

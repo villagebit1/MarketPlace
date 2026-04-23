@@ -46,6 +46,7 @@ router.get('/store', auth.protect, controller.showStore)
 router.get('/products', controller.showPageProducts)
 router.post('/products', controller.addProducts)
 router.post('/orders', controller.order)
+router.get('/orders', controller.order)
 router.get('/logout', controller.logout)
 router.post('/logout', controller.logout)
 router.get('/auth/github',

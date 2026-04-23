@@ -2,6 +2,18 @@ const Order = require('../models/order')
 
 class PurchasesService{
 
+    async getOrdersByUser(userId) {
+        // Use .find() to get multiple documents
+        // Use .sort() to show newest orders first (Marketplace standard)
+        const orders = await Order.find({ user_id: userId }).sort({ order_date: -1 });
+
+        if (!orders || orders.length === 0) {
+            return []; // Return empty array instead of throwing error
+        }
+
+        return orders;
+    }
+
     async includeOrder(itens){
         
         try {

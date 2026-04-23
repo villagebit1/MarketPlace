@@ -54,6 +54,82 @@ exports.signup = async(req, res, next) => {
     }
 }
 
+exports.buscarPedidos = async(req, res, next) => {
+
+    try {
+        const pedidos = order.findOne
+        /*var total = 0;
+        
+        const OrderStatus = {
+            PENDING: 'pending',
+            SHIPPED: 'shipped',
+            DELIVERED: 'delivered',
+            CANCELLED: 'cancelled'
+        };
+
+        const user_id = "698f93cfa0a67688814e149e"
+        var order_date = new Date()
+        var status = OrderStatus.PENDING
+        const shipping_addr = "w Sahara - Ave Las Vegas"
+
+        // for (const itemData of itens) {      
+        //     itemData.preco,
+        //     itemData.quantidade,
+        //     total += itemData.preco * itemData.quantidade
+        // }
+
+        itens.forEach(item => { 
+            item.preco,
+            item.quantidade,
+            total += item.preco * item.quantidade 
+        })
+        
+        var order = new Order(user_id, order_date, total, status, shipping_addr)
+        console.log("Total ", total)   
+        const orderId = await order.save(); */
+        const orderId = await purchasesService.includeOrder(itens);
+
+        console.log('Last registry id: ', orderId)
+
+        for (const itemData of itens) {   
+            var product_id = 'ioe88932kcc'   
+            const orderItem = new OrderItem(//Salvando o(s) item/produto(s) do pedido c/ a quantidade e preco
+                orderId,
+                product_id,
+                itemData.quantidade,
+                itemData.preco
+            );
+            await orderItem.save();
+        }
+
+        res.status(201).json({ message: "Compra salva!" });
+
+        console.log(order);
+        console.log("Full Body:", JSON.stringify(req.body, null, 2));
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Save failed" });
+    }
+}
+
+exports.getUserOrders = async (req, res) => {
+    try {
+        // Get the ID from the session user we set during login
+        const userId = req.session.user.id || req.user.id; 
+
+        const orders = await orderService.getOrdersByUser(userId);
+
+        return res.status(200).json({
+            success: true,
+            count: orders.length,
+            orders: orders
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: "Error fetching orders" });
+    }
+};
+
 exports.order = async(req, res, next) => {
 
     try {
